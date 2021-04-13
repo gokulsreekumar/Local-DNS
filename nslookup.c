@@ -1,6 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h> 
+#include <string.h> 
+#include <sys/types.h> 
+#include <sys/socket.h> 
+#include <arpa/inet.h> 
+#include <netinet/in.h>
+
 
 #define CANONICAL_NAME -10
 #define ANSWER 0
@@ -55,7 +62,6 @@ int tokenExtractor(FILE * fp, char name_server_list[100][100],
     int subdomain = 0;
 
     // ------ Extracting Tokens and Analyzing the Output.
-    // --------------------------------------------------
 
     int cnt_nameservers = 0;
 
@@ -453,9 +459,30 @@ int main(int argc, char * argv[]) {
 
     int socket = serverStart();
 
-    while() {
+    while(1) {
 
+        int n;
+        char client_message[100];
+        char server_message[100];
         
+        // Clean buffers:
+        memset(server_message,'\0',sizeof(server_message));
+        memset(client_message,'\0',sizeof(client_message));
+        
+        
+        n = recvfrom(socket, client_message, strlen(client_message), MSG_WAITALL, ( struct sockaddr *) &client_address, &len); 
+        printf("Message from Client : %s\n", client_message);
+        
+        //Get message to be sent to server as input
+        // printf("Enter message to be sent to client: ");
+        //     scanf("%[^\n]",server_message);
+        //     getchar();
+        
+        sprintf(server_message, "HELLO\n");
+
+        sendto(socket, server_message, strlen(server_message), MSG_CONFIRM, (const struct sockaddr *) &client_address, len); 
+        printf("Message sent to Client successfully.\n");
+
     }
 
 
